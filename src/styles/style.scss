@@ -70,8 +70,11 @@ main {
     animation: pulse 1.5s ease-in-out .5s infinite
 }
 
-.fit-image {
+img.fit-image {
     object-fit: contain;
+}
+img.fill-image {
+    object-fit: fill;
 }
 
 @keyframes pulse {

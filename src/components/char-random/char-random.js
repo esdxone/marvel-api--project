@@ -19,6 +19,10 @@ class CharRandom extends Component {
 
     marvelService = new Marvelservice();
 
+    componentDidMount() {
+        this.getChar();
+    }
+
     onError = () => {
         this.setState({
             loading: false,
@@ -41,9 +45,6 @@ class CharRandom extends Component {
             .catch(this.onError)
     }
 
-    componentDidMount() {
-        this.getChar();
-    }
 
     render () {
         const {char, loading, error} = this.state;
