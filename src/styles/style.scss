@@ -70,6 +70,10 @@ main {
     animation: pulse 1.5s ease-in-out .5s infinite
 }
 
+.fit-image {
+    object-fit: contain;
+}
+
 @keyframes pulse {
     0% {
         opacity: 1

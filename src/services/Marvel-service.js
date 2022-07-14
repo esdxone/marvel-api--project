@@ -27,19 +27,9 @@ class Marvelservice {
     }
 
     _transformChar = (char) => {
-        let description = "";
-
-        if (!char.description) {
-            description = "Sorry, we can't find information about this character!";
-        } else if (char.description.lenght > 180) {
-            description = `${char.description.substring(0,180)}...`
-        } else {
-            description = char.description;
-        }
-
         return {
             name: char.name,
-            description: description,
+            description: char.description ? `${char.description.slice(0, 210)}...` : "Sorry, we can't find information about this character!",
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
             wiki: char.urls[1].url
