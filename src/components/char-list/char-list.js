@@ -12,14 +12,25 @@ class CharList extends Component {
         this.state = {
             charlist: [],
             loading: true,
-            error: false
+            error: false,
+            loadingItems: false,
+            offset: 210,
+            endList: false
         }
     }
 
     marvelService = new Marvelservice();
 
     componentDidMount() {
-        this.getChar();
+        this.onRequest(this.state.offset);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.endList === this.state.offset) {
+            this.setState({
+                endList: false
+            })
+        }
     }
 
     onError = () => {
@@ -29,26 +40,40 @@ class CharList extends Component {
         });
     }
 
-    onCharLoaded = (charlist) => {
-        this.setState({
-            charlist,
-            loading: false
-        })
-    }
-
-    getChar = () => {
+    onRequest = (offset) => {
+        this.onCharLoadingList();
         this.marvelService
-        .getAllCharacters()
+        .getAllCharacters(offset)
         .then(this.onCharLoaded)
         .catch(this.onError)
     }
 
-    renderElements() {
-        const elements = this.state.charlist.map(item => {
-            const {name,thumbnail} = item;
+    onCharLoadingList = () => {
+        this.setState({
+            loadingItems: true
+        })
+    }
+
+    onCharLoaded = (newCharlist) => {
+        let ended = false;
+        if (newCharlist.length < 9) ended = true
+
+        this.setState(({charlist, offset}) => ({
+                charlist: [...charlist,...newCharlist],
+                loading: false,
+                loadingItems: false,
+                offset: offset + 9,
+                endList: ended
+        }))
+    }
+
+    renderElements(charlist) {
+        const elements = charlist.map(item => {
+            const {name,thumbnail, id} = item;
+            const {onSelectedChar} = this.props;
             const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fill-image" : '';
             return (
-                <li key={name} className="char__item">
+                <li key={id} className="char__item" onClick={() => onSelectedChar(id)}>
                 <img className={fitImage} src={thumbnail} alt="abyss"/>
                 <div className="char__name">{name}</div>
             </li>
@@ -63,8 +88,8 @@ class CharList extends Component {
     }
 
     render() {
-        const {loading,error} = this.state;
-        const items = this.renderElements();
+        const {charlist,loading,error, loadingItems, offset, endList} = this.state;
+        const items = this.renderElements(charlist);
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <PreloaderSpinner/> : null;
         const content = !(spinner || errorMessage) ? items : null;
@@ -74,8 +99,12 @@ class CharList extends Component {
                 {errorMessage}
                 {spinner}
                 {content}
-                <button className="button button__main button__long">
-                    <div className="inner">load more</div>
+                <button
+                disabled={loadingItems}
+                onClick={() => this.onRequest(offset)}
+                style={{'display': endList ? 'none' : 'block'}}
+                className="button button__main button__long">
+                    <div  className="inner">load more</div>
                 </button>
             </div>
         )
