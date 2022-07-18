@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React, {Component} from 'react';
 import Marvelservice from '../../services/Marvel-service';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
@@ -17,13 +17,17 @@ class CharList extends Component {
             offset: 210,
             endList: false
         }
+
     }
 
     marvelService = new Marvelservice();
 
     componentDidMount() {
         this.onRequest(this.state.offset);
+        console.log(this.focus)
     }
+
+
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.endList === this.state.offset) {
@@ -67,13 +71,36 @@ class CharList extends Component {
         }))
     }
 
+    itemRefs = [];
+
+    setRef = (ref) => {
+        this.itemRefs.push(ref);
+    }
+
+    focusOnItem = (id) => {
+        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
+        this.itemRefs[id].classList.add('char__item_selected');
+        this.itemRefs[id].focus();
+    }
+
+
     renderElements(charlist) {
-        const elements = charlist.map(item => {
+        const elements = charlist.map((item, i) => {
             const {name,thumbnail, id} = item;
             const {onSelectedChar} = this.props;
             const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fill-image" : '';
             return (
-                <li key={id} className="char__item" onClick={() => onSelectedChar(id)}>
+                <li key={id}
+                ref={this.setRef}
+                tabIndex="0"
+                className="char__item"
+                onKeyPress={(e) => {
+                    if (e.key === ' ' || e.key === "Enter") {
+                        this.props.onSelectedChar(id);
+                        this.focusOnItem(i);
+                    }
+                }}
+                onClick={() => onSelectedChar(id)}>
                 <img className={fitImage} src={thumbnail} alt="abyss"/>
                 <div className="char__name">{name}</div>
             </li>
