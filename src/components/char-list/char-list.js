@@ -100,7 +100,10 @@ class CharList extends Component {
                         this.focusOnItem(i);
                     }
                 }}
-                onClick={() => onSelectedChar(id)}>
+                onClick={() => {
+                    onSelectedChar(id);
+                    this.focusOnItem(i);}
+                }>
                 <img className={fitImage} src={thumbnail} alt="abyss"/>
                 <div className="char__name">{name}</div>
             </li>
