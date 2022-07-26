@@ -1,108 +1,83 @@
-import React, {Component} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import Marvelservice from '../../services/Marvel-service';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
 
 import './char-list.scss';
 
-class CharList extends Component {
+const CharList = (props) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            charlist: [],
-            loading: true,
-            error: false,
-            loadingItems: false,
-            offset: 210,
-            endList: false
-        }
+    const [charlist, setCharList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [loadingItems, setLoadingItems] = useState(false);
+    const [offset, setOffset] = useState(210);
+    const [endList, setEndList] = useState(false);
 
+    const marvelService = new Marvelservice();
+
+    useEffect(() => {
+        onRequest();
+    },[]);
+
+    useEffect(() => {
+        setEndList(endList => false)
+    },[endList]);
+
+    const onError = () => {
+        setLoading(false);
+        setError(true);
     }
 
-    marvelService = new Marvelservice();
-
-    componentDidMount() {
-        this.onRequest(this.state.offset);
-        console.log(this.focus)
-    }
-
-
-
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.endList === this.state.offset) {
-            this.setState({
-                endList: false
-            })
-        }
-    }
-
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        });
-    }
-
-    onRequest = (offset) => {
-        this.onCharLoadingList();
-        this.marvelService
+    const onRequest = (offset) => {
+        onCharLoadingList();
+        marvelService
         .getAllCharacters(offset)
-        .then(this.onCharLoaded)
-        .catch(this.onError)
+        .then(onCharLoaded)
+        .catch(onError)
     }
 
-    onCharLoadingList = () => {
-        this.setState({
-            loadingItems: true
-        })
+    const onCharLoadingList = () => {
+        setLoadingItems(true);
     }
 
-    onCharLoaded = (newCharlist) => {
+    const onCharLoaded = (newCharlist) => {
         let ended = false;
         if (newCharlist.length < 9) ended = true
-
-        this.setState(({charlist, offset}) => ({
-                charlist: [...charlist,...newCharlist],
-                loading: false,
-                loadingItems: false,
-                offset: offset + 9,
-                endList: ended
-        }))
+        setCharList(charlist => [...charlist,...newCharlist])
+        setLoading(loading => false);
+        setLoadingItems(loadingItems => false);
+        setOffset(offset => offset + 9);
+        setEndList(endList => ended);
     }
 
-    itemRefs = [];
+    let itemRefs = useRef([]);
 
-    setRef = (ref) => {
-        this.itemRefs.push(ref);
-    }
-
-    focusOnItem = (id) => {
-        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
-        this.itemRefs[id].classList.add('char__item_selected');
-        this.itemRefs[id].focus();
+    const focusOnItem = (id) => {
+        itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
+        itemRefs.current[id].classList.add('char__item_selected');
+        itemRefs.current[id].focus();
     }
 
 
-    renderElements(charlist) {
+    function renderElements(charlist) {
         const elements = charlist.map((item, i) => {
             const {name,thumbnail, id} = item;
-            const {onSelectedChar} = this.props;
             const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fill-image" : '';
             return (
                 <li key={id}
-                ref={this.setRef}
+                ref={elem => itemRefs.current[i] = elem}
                 tabIndex="0"
                 className="char__item"
                 onKeyPress={(e) => {
                     if (e.key === ' ' || e.key === "Enter") {
-                        this.props.onSelectedChar(id);
-                        this.focusOnItem(i);
+                        props.onSelectedChar(id);
+                        focusOnItem(i);
                     }
                 }}
                 onClick={() => {
-                    onSelectedChar(id);
-                    this.focusOnItem(i);}
+                    props.onSelectedChar(id);
+                    focusOnItem(i);}
                 }>
                 <img className={fitImage} src={thumbnail} alt="abyss"/>
                 <div className="char__name">{name}</div>
@@ -116,10 +91,7 @@ class CharList extends Component {
             </ul>
         )
     }
-
-    render() {
-        const {charlist,loading,error, loadingItems, offset, endList} = this.state;
-        const items = this.renderElements(charlist);
+        const items = renderElements(charlist);
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <PreloaderSpinner/> : null;
         const content = !(spinner || errorMessage) ? items : null;
@@ -131,7 +103,7 @@ class CharList extends Component {
                 {content}
                 <button
                 disabled={loadingItems}
-                onClick={() => this.onRequest(offset)}
+                onClick={() => onRequest(offset)}
                 style={{'display': endList ? 'none' : 'block'}}
                 className="button button__main button__long">
                     <div  className="inner">load more</div>
@@ -139,6 +111,5 @@ class CharList extends Component {
             </div>
         )
     }
-}
 
 export default CharList;
