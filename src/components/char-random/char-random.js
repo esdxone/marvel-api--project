@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
 import Marvelservice from '../../services/Marvel-service';
@@ -6,55 +6,43 @@ import Marvelservice from '../../services/Marvel-service';
 import './char-random.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
-class CharRandom extends Component {
+const CharRandom = (props) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-           char: {},
-           loading: true,
-           error: false
-         }
+    const [char, setChar] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const marvelService = new Marvelservice();
+
+    useEffect(() => {
+        getChar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+
+   const onCharLoading = () => {
+        setLoading(true);
     }
 
-    marvelService = new Marvelservice();
-
-    componentDidMount() {
-        this.getChar();
+    const onError = () => {
+        setLoading(false);
+        setError(true);
     }
 
-    onCharLoading() {
-        this.setState({
-            loading: true
-        })
+    const onCharLoaded = (char) => {
+        setChar(char);
+        setLoading(false);
     }
 
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        });
-    }
-
-    onCharLoaded = (char) => {
-        this.setState({
-            char,
-            loading: false
-        });
-    }
-
-    getChar = () => {
-        this.onCharLoading();
+    const getChar = () => {
+        onCharLoading();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        this.marvelService
-            .getCharacter(id)
-            .then(this.onCharLoaded)
-            .catch(this.onError)
+        marvelService
+        .getCharacter(id)
+        .then(onCharLoaded)
+        .catch(onError)
     }
 
-
-    render () {
-        const {char, loading, error} = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <PreloaderSpinner/> : null;
         const content = !(spinner || errorMessage) ? <CharElement data={char}/> : null;
@@ -73,13 +61,12 @@ class CharRandom extends Component {
                     Or choose another one
                 </p>
                 <button className="button button__main">
-                    <div onClick={this.getChar} className="inner">try it</div>
+                    <div onClick={getChar} className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
         </div>
         )
-    }
 }
 
 const CharElement = ({data}) => {
