@@ -1,6 +1,6 @@
 import { useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import Marvelservice from '../../services/Marvel-service';
+import useMarvelservice from '../../services/Marvel-service';
 import ErrorMessage from '../error-message/error-message';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import PreloaderSkeleton from '../preloader-skeleton/preloader-skeleton';
@@ -11,27 +11,14 @@ import './char-info.scss';
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-
-    const marvelService = new Marvelservice();
+    const {loading, error, getCharacter} = useMarvelservice();
 
     useEffect(() => {
         getChar();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.charId])
 
-    const onCharLoading = () => {
-        setLoading(loading => true);
-    }
-
-    const onError = () => {
-        setLoading(loading => false);
-        setError(error => true);
-    }
-
     const onCharLoaded = (char) => {
-        setLoading(false);
         setChar(char);
     }
 
@@ -41,13 +28,8 @@ const CharInfo = (props) => {
         if (!charId) {
             return;
         }
-
-        onCharLoading();
-
-        marvelService
-        .getCharacter(charId)
+        getCharacter(charId)
         .then(onCharLoaded)
-        .catch(onError)
     }
         const skeleton = char || loading || error ? null : <PreloaderSkeleton/>;
         const errorMessage = error ? <ErrorMessage/> : null;

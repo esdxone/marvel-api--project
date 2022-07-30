@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
-import Marvelservice from '../../services/Marvel-service';
+import useMarvelservice from '../../services/Marvel-service';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
 
@@ -14,7 +14,7 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(210);
     const [endList, setEndList] = useState(false);
 
-    const marvelService = new Marvelservice();
+    const marvelService = useMarvelservice();
 
     useEffect(() => {
         onRequest();

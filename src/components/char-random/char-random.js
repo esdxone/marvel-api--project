@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
-import Marvelservice from '../../services/Marvel-service';
+import useMarvelservice from '../../services/Marvel-service';
 
 import './char-random.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -9,38 +9,21 @@ import mjolnir from '../../resources/img/mjolnir.png';
 const CharRandom = (props) => {
 
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-
-    const marvelService = new Marvelservice();
+    const {loading, error, getCharacter} = useMarvelservice();
 
     useEffect(() => {
         getChar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-
-   const onCharLoading = () => {
-        setLoading(true);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
     }
 
     const getChar = () => {
-        onCharLoading();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        marvelService
-        .getCharacter(id)
-        .then(onCharLoaded)
-        .catch(onError)
+        getCharacter(id)
+        .then(onCharLoaded);
     }
 
         const errorMessage = error ? <ErrorMessage/> : null;
@@ -72,10 +55,10 @@ const CharRandom = (props) => {
 const CharElement = ({data}) => {
 
     const {name, description, thumbnail, homepage, wiki} = data;
-    const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fit-image" : '';
+    // const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fit-image" : '';
     return (
         <div className="randomchar__block">
-        <img src={thumbnail} alt={name} title={name} className={`randomchar__img ${fitImage}`}/>
+        <img src={thumbnail} alt={name} title={name} className={`randomchar__img ${'fit-image'}`}/>
         <div className="randomchar__info">
             <p className="randomchar__name">{name}</p>
             <p className="randomchar__descr">
