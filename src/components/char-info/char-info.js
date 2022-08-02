@@ -11,7 +11,7 @@ import './char-info.scss';
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null);
-    const {loading, error, getCharacter} = useMarvelservice();
+    const {loading, error, getCharacter, clearError} = useMarvelservice();
 
     useEffect(() => {
         getChar();
@@ -23,7 +23,7 @@ const CharInfo = (props) => {
     }
 
     const getChar = () => {
-        console.log(props.charId)
+        clearError();
         const {charId} = props;
         if (!charId) {
             return;

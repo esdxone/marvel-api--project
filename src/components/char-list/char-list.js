@@ -8,16 +8,13 @@ import './char-list.scss';
 const CharList = (props) => {
 
     const [charlist, setCharList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [loadingItems, setLoadingItems] = useState(false);
     const [offset, setOffset] = useState(210);
     const [endList, setEndList] = useState(false);
-
-    const marvelService = useMarvelservice();
+    const {loading, error, getAllCharacters} = useMarvelservice();
 
     useEffect(() => {
-        onRequest();
+        onRequest(offset, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
@@ -25,28 +22,16 @@ const CharList = (props) => {
         setEndList(endList => false)
     },[endList]);
 
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
-    const onRequest = (offset) => {
-        onCharLoadingList();
-        marvelService
-        .getAllCharacters(offset)
+    const onRequest = (offset, initial) => {
+        initial ? setLoadingItems(false) : setLoadingItems(true);
+        getAllCharacters(offset)
         .then(onCharLoaded)
-        .catch(onError)
-    }
-
-    const onCharLoadingList = () => {
-        setLoadingItems(true);
     }
 
     const onCharLoaded = (newCharlist) => {
         let ended = false;
         if (newCharlist.length < 9) ended = true
         setCharList(charlist => [...charlist,...newCharlist])
-        setLoading(loading => false);
         setLoadingItems(loadingItems => false);
         setOffset(offset => offset + 9);
         setEndList(endList => ended);
@@ -94,14 +79,13 @@ const CharList = (props) => {
     }
         const items = renderElements(charlist);
         const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <PreloaderSpinner/> : null;
-        const content = !(spinner || errorMessage) ? items : null;
+        const spinner = loading && !loadingItems ? <PreloaderSpinner/> : null;
 
         return(
             <div className="char__list">
                 {errorMessage}
                 {spinner}
-                {content}
+                {items}
                 <button
                 disabled={loadingItems}
                 onClick={() => onRequest(offset)}
