@@ -1,4 +1,5 @@
 import { useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import useMarvelservice from '../../services/Marvel-service';
 import ErrorMessage from '../error-message/error-message';
@@ -71,12 +72,13 @@ const CharElement = ({data}) => {
             <ul className="char__comics-list">
                 {comics.length > 0 ? null : "Comics not found"}
                 {   comics.map((item, i) => {
+                    const comicsId = item.resourceURI.split('/').pop();
                     // eslint-disable-next-line
                     if(i > 9) return
                         return (
-                            <li key={i} className="char__comics-item">
+                            <Link to={`/comics/${comicsId}`} key={i} className="char__comics-item">
                                 {item.name}
-                            </li>
+                            </Link>
                         )
                     })
                 }

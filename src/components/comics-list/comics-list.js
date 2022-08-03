@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import useMarvelservice from '../../services/Marvel-service';
 import ErrorMessage from '../error-message/error-message';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
@@ -36,21 +37,19 @@ const ComicsList = (props) => {
         setLoadingItems(false);
         setOffset(offset => offset + 8);
         setEndList(endList => ended);
-        console.log(offset)
     }
 
     function renderElements(comicsList) {
         const elements = comicsList.map((item) => {
             const {name, thumbnail, id, price} = item;
             const fitImage = thumbnail.indexOf('image_not_available') !== -1 ? "fill-image" : '';
-            const priceControl = price !== 0 ? `${price}$` : 'Sold out';
             return (
             <li key={id} className="comics__item">
-                <a href="#">
+                <Link to={`/comics/${id}`}>
                     <img src={thumbnail} alt={name} className={`comics__item-img ${fitImage}`}/>
                     <div className="comics__item-name">{name}</div>
-                    <div className="comics__item-price">{priceControl}</div>
-                </a>
+                    <div className="comics__item-price">{price}</div>
+                </Link>
             </li>
             )
         })

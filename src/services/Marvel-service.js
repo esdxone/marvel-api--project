@@ -22,9 +22,14 @@ const useMarvelservice = () => {
 
     const getAllComics = async(offset = _baseOffset) => {
         const res = await request(`${_comicsPath}?format=comic&formatType=comic&&orderBy=title&offset=${offset}&limit=8&apikey=${_apiKey}`);
-        console.log(res.data.results);
         return res.data.results.map(_transformComics);
     }
+
+    const getComics = async (id) => {
+        const res = await request(`${_comicsPath}/${id}?apikey=${_apiKey}`);
+        return _transformComics(res.data.results[0]);
+    }
+
 
     const _transformChar = (char) => {
         return {
@@ -34,7 +39,7 @@ const useMarvelservice = () => {
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
             wiki: char.urls[1].url,
-            comics: char.comics.items
+            comics: char.comics.items,
         }
     }
 
@@ -42,16 +47,17 @@ const useMarvelservice = () => {
         return {
             id: comics.id,
             name: comics.title,
-            description: comics.description ? `${comics.description.slice(0, 210)}...` : "Sorry, we can't find information about this character!",
+            description: comics.description ? comics.description : "Sorry, we can't find information about this character!",
             thumbnail: `${comics.thumbnail.path}.${comics.thumbnail.extension}`,
-            price: comics.prices[0].price,
-            pageCount: comics.pageCount
+            price: comics.prices[0].price === 0 ? 'Sold out' : `${comics.prices[0].price}$`,
+            pageCount: comics.pageCount,
+            language: comics.textObjects[0].language
         }
     }
 
 
 
-    return {getAllCharacters, getCharacter, getAllComics, clearError, loading, error};
+    return {getAllCharacters, getCharacter, getAllComics, getComics, clearError, loading, error};
 }
 
 export default useMarvelservice;

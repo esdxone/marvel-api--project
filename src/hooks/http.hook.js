@@ -21,7 +21,7 @@ export const useHttp = () => {
 
         } catch(e) {
             setLoading(false);
-            setError(e.massage);
+            setError(true);
             throw e;
         }
 
