@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import './char-detail.scss';
 
-const CharDetail = ({item}) => {
+const CharDetail = ({data}) => {
 
-    const {name, thumbnail, description} = item;
+    const {name, thumbnail, description} = data;
 
     return (
         <>

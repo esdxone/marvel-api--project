@@ -2,9 +2,7 @@ import { useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import useMarvelservice from '../../services/Marvel-service';
-import ErrorMessage from '../error-message/error-message';
-import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
-import PreloaderSkeleton from '../preloader-skeleton/preloader-skeleton';
+import setContent from '../../utils/set-content';
 
 import './char-info.scss';
 
@@ -12,9 +10,10 @@ import './char-info.scss';
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null);
-    const {loading, error, getCharacter, clearError} = useMarvelservice();
+    const {process, getCharacter, setProcess, clearError} = useMarvelservice();
 
     useEffect(() => {
+        if (!props.charId) return;
         getChar();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.charId])
@@ -25,23 +24,15 @@ const CharInfo = (props) => {
 
     const getChar = () => {
         clearError();
-        const {charId} = props;
-        if (!charId) {
-            return;
-        }
-        getCharacter(charId)
+        if (!props.charId) return;
+        getCharacter(props.charId)
         .then(onCharLoaded)
+        .then(() => setProcess('confirmed'))
     }
-        const skeleton = char || loading || error ? null : <PreloaderSkeleton/>;
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <PreloaderSpinner/> : null;
-        const content = !(spinner || errorMessage || !char) ? <CharElement data={char}/> : null;
+
         return (
             <div className="char__info">
-                {skeleton}
-                {errorMessage}
-                {spinner}
-                {content}
+                {setContent(process, CharElement, char)}
             </div>
         )
 }

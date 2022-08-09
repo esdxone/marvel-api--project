@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import './comics-detail.scss';
 
-const ComicsDetail = ({item}) => {
+const ComicsDetail = ({data}) => {
 
-    const {name, thumbnail, description, pageCount, language, price} = item;
+    const {name, thumbnail, description, pageCount, language, price} = data;
 
     return (
         <>

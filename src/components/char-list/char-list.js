@@ -2,8 +2,22 @@ import {useState, useEffect, useRef} from 'react';
 import useMarvelservice from '../../services/Marvel-service';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
-
 import './char-list.scss';
+
+const setContent = (process, Component, loadingItems) => {
+    switch(process) {
+        case 'waiting':
+            return <PreloaderSpinner/>;
+        case 'loading':
+            return loadingItems ? <Component/> : <PreloaderSpinner/>;
+        case 'error':
+            return <ErrorMessage/>;
+        case 'confirmed':
+            return <Component/>;
+        default:
+            throw new Error('Unexepted error');
+    }
+}
 
 const CharList = (props) => {
 
@@ -11,7 +25,7 @@ const CharList = (props) => {
     const [loadingItems, setLoadingItems] = useState(false);
     const [offset, setOffset] = useState(210);
     const [endList, setEndList] = useState(false);
-    const {loading, error, getAllCharacters} = useMarvelservice();
+    const {process, setProcess, getAllCharacters} = useMarvelservice();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -26,6 +40,7 @@ const CharList = (props) => {
         initial ? setLoadingItems(false) : setLoadingItems(true);
         getAllCharacters(offset)
         .then(onCharLoaded)
+        .then(() => setProcess('confirmed'))
     }
 
     const onCharLoaded = (newCharlist) => {
@@ -77,15 +92,10 @@ const CharList = (props) => {
             </ul>
         )
     }
-        const items = renderElements(charlist);
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading && !loadingItems ? <PreloaderSpinner/> : null;
 
         return(
             <div className="char__list">
-                {errorMessage}
-                {spinner}
-                {items}
+                {setContent(process, () => renderElements(charlist), loadingItems)}
                 <button
                 disabled={loadingItems}
                 onClick={() => onRequest(offset)}

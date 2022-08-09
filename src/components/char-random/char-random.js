@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
-import ErrorMessage from '../error-message/error-message';
+import setContent from '../../utils/set-content';
 import useMarvelservice from '../../services/Marvel-service';
 
 import './char-random.scss';
@@ -9,7 +8,7 @@ import mjolnir from '../../resources/img/mjolnir.png';
 const CharRandom = (props) => {
 
     const [char, setChar] = useState({});
-    const {loading, error, getCharacter, clearError} = useMarvelservice();
+    const {process, setProcess, getCharacter, clearError} = useMarvelservice();
 
     useEffect(() => {
         getChar();
@@ -24,18 +23,13 @@ const CharRandom = (props) => {
         clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         getCharacter(id)
-        .then(onCharLoaded);
+        .then(onCharLoaded)
+        .then(() => setProcess('confirmed'));
     }
-
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <PreloaderSpinner/> : null;
-        const content = !(spinner || errorMessage) ? <CharElement data={char}/> : null;
 
         return (
         <div className="randomchar">
-             {errorMessage}
-             {spinner}
-             {content}
+            {setContent(process, CharElement, char)}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>

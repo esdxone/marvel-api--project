@@ -1,7 +1,7 @@
 import { useHttp } from "../hooks/http.hook";
 
 const useMarvelservice = () => {
-    const {loading, request, error, clearError} = useHttp();
+    const {request, clearError, process, setProcess} = useHttp();
 
 
     const _charPath = "https://gateway.marvel.com:443/v1/public/characters";
@@ -62,7 +62,14 @@ const useMarvelservice = () => {
 
 
 
-    return {getAllCharacters, getCharacter, getCharacterbyName, getAllComics, getComics, clearError, loading, error};
+    return {getAllCharacters,
+            getCharacter,
+            getCharacterbyName,
+            getAllComics,
+            getComics,
+            clearError,
+            setProcess,
+            process};
 }
 
 export default useMarvelservice;

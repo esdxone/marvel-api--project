@@ -1,8 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect} from 'react';
 import useMarvelservice from '../../services/Marvel-service';
-import ErrorMessage from '../error-message/error-message';
-import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
+import setContent from '../../utils/set-content';
 import AppBanner from '../app-banner/app-banner';
 
 
@@ -10,7 +9,7 @@ const DetailPageLayout = ({Component, dataType}) => {
 
     const {elementId} = useParams();
     const [item, setItem] = useState([]);
-    const {loading, error, getComics, getCharacter, clearError} = useMarvelservice();
+    const {process, setProcess, getComics, getCharacter, clearError} = useMarvelservice();
 
     useEffect(() => {
         getItem();
@@ -28,25 +27,21 @@ const DetailPageLayout = ({Component, dataType}) => {
         switch (dataType) {
             case 'comic':
                 getComics(elementId)
-                    .then(onItemLoaded);
+                    .then(onItemLoaded)
+                    .then(() => setProcess('confirmed'));
                 break;
             case 'character':
                 getCharacter(elementId)
-                    .then(onItemLoaded);
+                    .then(onItemLoaded)
+                    .then(() => setProcess('confirmed'));
         }
 
     }
 
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <PreloaderSpinner/> : null;
-        const content = !(spinner || errorMessage || !item) ? <Component item={item}/> : null;
-
     return (
         <>
             <AppBanner/>
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, Component, item)}
         </>
     )
 }
