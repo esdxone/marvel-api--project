@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {Helmet} from 'react-helmet';
 import CharRandom from '../char-random/char-random';
 import CharList from '../char-list/char-list';
 import CharInfo from '../char-info/char-info';
@@ -12,6 +13,13 @@ const HomePage = () => {
     const onSelectedChar = (id) => setCurrentChar(id);
     return (
          <>
+            <Helmet>
+                <meta
+                name="description"
+                content="Marvel infomation portal"
+                />
+                <title>Marvel</title>
+            </Helmet>
             <ErrorBoundary>
                 <CharRandom/>
             </ErrorBoundary>

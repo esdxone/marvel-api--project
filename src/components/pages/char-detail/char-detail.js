@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import './char-detail.scss';
 
 const CharDetail = ({item}) => {
@@ -6,6 +7,14 @@ const CharDetail = ({item}) => {
     const {name, thumbnail, description} = item;
 
     return (
+        <>
+        <Helmet>
+            <meta
+            name="description"
+            content={`Information about ${name}`}
+            />
+            <title>{name}</title>
+        </Helmet>
         <div className="single-comic">
             <img src={thumbnail} alt={name} className="single-comic__img"/>
             <div className="single-comic__info">
@@ -14,6 +23,7 @@ const CharDetail = ({item}) => {
             </div>
             <Link to="/characters" className="single-comic__back">Back to all</Link>
         </div>
+        </>
     )
 }
 

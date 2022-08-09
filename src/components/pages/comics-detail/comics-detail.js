@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import './comics-detail.scss';
 
 const ComicsDetail = ({item}) => {
@@ -6,6 +7,14 @@ const ComicsDetail = ({item}) => {
     const {name, thumbnail, description, pageCount, language, price} = item;
 
     return (
+        <>
+         <Helmet>
+            <meta
+            name="description"
+            content={`Comics about ${name}`}
+            />
+            <title>{name}</title>
+        </Helmet>
         <div className="single-comic">
             <img src={thumbnail} alt={name} className="single-comic__img"/>
             <div className="single-comic__info">
@@ -17,6 +26,7 @@ const ComicsDetail = ({item}) => {
             </div>
             <Link to="/comics" className="single-comic__back">Back to all</Link>
         </div>
+        </>
     )
 }
 
