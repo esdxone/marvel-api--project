@@ -4,7 +4,24 @@ import useMarvelservice from '../../services/Marvel-service';
 import ErrorMessage from '../error-message/error-message';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 
+
 import './comics-list.scss';
+
+
+const setContent = (process, Component, loadingItems) => {
+    switch(process) {
+        case 'waiting':
+            return <PreloaderSpinner/>;
+        case 'loading':
+            return loadingItems ? <Component/> : <PreloaderSpinner/>;
+        case 'error':
+            return <ErrorMessage/>;
+        case 'confirmed':
+            return <Component/>;
+        default:
+            throw new Error('Unexepted error');
+    }
+}
 
 const ComicsList = (props) => {
 
@@ -12,7 +29,7 @@ const ComicsList = (props) => {
     const [loadingItems, setLoadingItems] = useState(false);
     const [offset, setOffset] = useState(0);
     const [endList, setEndList] = useState(false);
-    const {loading, error, getAllComics, clearError} = useMarvelservice();
+    const {process, setProcess, getAllComics, clearError} = useMarvelservice();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -27,6 +44,7 @@ const ComicsList = (props) => {
         initial ? setLoadingItems(false) : setLoadingItems(true);
         getAllComics(offset)
         .then(onComicsLoading)
+        .then(() => setProcess('confirmed'));
     }
 
     const onComicsLoading = (newComicsList) => {
@@ -59,16 +77,9 @@ const ComicsList = (props) => {
             </ul>
         )
     }
-
-    const items = renderElements(comicsList);
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !loadingItems ? <PreloaderSpinner/> : null;
-
     return (
         <div className="comics__list">
-            {errorMessage}
-            {spinner}
-           {items}
+            {setContent(process, () => renderElements(comicsList), loadingItems)}
             <button
             disabled={loadingItems}
             onClick={() => onRequest(offset)}

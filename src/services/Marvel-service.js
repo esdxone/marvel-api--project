@@ -56,7 +56,7 @@ const useMarvelservice = () => {
             thumbnail: `${comics.thumbnail.path}.${comics.thumbnail.extension}`,
             price: comics.prices[0].price === 0 ? 'Sold out' : `${comics.prices[0].price}$`,
             pageCount: comics.pageCount,
-            language: comics.textObjects[0].language
+            language: comics.textObjects.language || 'en-us'
         }
     }
 
