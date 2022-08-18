@@ -2,7 +2,6 @@ import {useState, useEffect, useRef} from 'react';
 import useMarvelservice from '../../services/Marvel-service';
 import PreloaderSpinner from '../preloader-spinner/preloader-spinner';
 import ErrorMessage from '../error-message/error-message';
-import { useGetHeroesQuery } from '../../api/api-slice';
 import './char-list.scss';
 
 const setContent = (process, Component, loadingItems) => {
@@ -21,8 +20,7 @@ const setContent = (process, Component, loadingItems) => {
 }
 
 const CharList = (props) => {
-    const {data: characters} = useGetHeroesQuery(210);
-    console.log(characters);
+
     const [charlist, setCharList] = useState([]);
     const [loadingItems, setLoadingItems] = useState(false);
     const [offset, setOffset] = useState(210);
